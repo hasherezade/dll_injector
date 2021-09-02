@@ -48,7 +48,7 @@ public:
         this->addParam(new WStringParam(PARAM_DLL, true));
         this->setInfo(PARAM_DLL, "DLL path");
 
-        EnumParam *myEnum = new EnumParam(PARAM_ACTION, GETNAME(t_actions), true);
+        EnumParam *myEnum = new EnumParam(PARAM_ACTION, "action_id", true);
         this->addParam(myEnum);
         this->setInfo(PARAM_ACTION, "Action to be executed");
         myEnum->addEnumValue(t_actions::ACTION_CHECK, "C", "check if the DLL is loaded");
