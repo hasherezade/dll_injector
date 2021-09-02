@@ -1,6 +1,6 @@
 cmake_minimum_required ( VERSION 2.8 )
 
-project ( paramkit_tpl )
+project ( dll_injector )
 
 # modules:
 set ( M_PARAMKIT_LIB "paramkit" )
@@ -11,4 +11,4 @@ add_subdirectory ( ${PARAMKIT_DIR} )
 set ( PARAMKIT_LIB $<TARGET_FILE:paramkit> CACHE PATH "ParamKit library path" )
 
 # main project
-add_subdirectory ( project_template )
+add_subdirectory ( dll_injector )

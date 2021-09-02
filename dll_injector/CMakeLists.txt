@@ -1,25 +1,25 @@
 cmake_minimum_required (VERSION 2.8)
 
-project ( project_template )
+project ( dll_injector )
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 
 include_directories ( ${PARAMKIT_DIR}/include )
 
 set (srcs
-#put your sources here
+	main.cpp
+	dll_injection.cpp
+	process_privilege.cpp
+	actions.cpp
 )
-
-# general headers - they will be used for both EXE and DLL:
 set (hdrs
-#put your headers here
+	params.h
+	dll_injection.h
+	process_privilege.h
+	actions.h
 )
 
-set (rsrc
-#put your resources here
-)
-
-add_executable ( ${PROJECT_NAME} ${exe_hdrs} ${srcs} ${rsrc} main.cpp )
+add_executable ( ${PROJECT_NAME} ${hdrs} ${srcs} )
 
 # link with paramkit.lib
 target_link_libraries ( ${PROJECT_NAME} ${PARAMKIT_LIB} )
