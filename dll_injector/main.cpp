@@ -11,11 +11,10 @@
 void banner()
 {
     char logo1[] = "\n\
- /\\_/\\\n\
-((@v@))  Hookoo\n\
-():::()  Injector for hooking libraries\n\
--\" - \"----\n";
-
+ /\\_/\\                                            \n\
+((@v@))     Hookoo                                \n\
+():::()     Injector for hooking libraries        \n\
+-\" - \"----                                        ";
     paramkit::print_in_color(MAKE_COLOR(BROWN, DARK_BLUE), logo1);
     std::cout << "\n" << std::endl;
 #ifdef _WIN64
@@ -24,6 +23,7 @@ void banner()
     std::cout << "32-bit version\n";
 #endif
     std::cout << "Built on: " << __DATE__ << "\n";
+    std::cout << "URL: https://github.com/hasherezade/dll_injector \n";
     std::cout << std::endl;
 }
 
