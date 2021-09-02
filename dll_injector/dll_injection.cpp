@@ -91,7 +91,12 @@ HANDLE open_process(DWORD pid)
         pid
     );
     if (!hProcess || hProcess == INVALID_HANDLE_VALUE) {
-        std::cerr << "[ERROR] [" << std::dec << pid << "] Opening the process failed: " << std::hex << "0x" << GetLastError() << std::endl;
+        const DWORD err = GetLastError();
+        if (err == ERROR_INVALID_PARAMETER) {
+            std::cerr << "[ERROR] [" << std::dec << pid << "] Opening the process failed. Is the process still running?"<< std::endl;
+            return NULL;
+        }
+        std::cerr << "[ERROR] [" << std::dec << pid << "] Opening the process failed: " << std::hex << "0x" << err << std::endl;
         return NULL;
     }
     return hProcess;
