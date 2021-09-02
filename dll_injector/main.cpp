@@ -69,14 +69,6 @@ bool action_unload(t_params_struct &iParams)
     return isFound;
 }
 
-void print_names(std::vector<std::string> successNames)
-{
-    std::vector<std::string>::iterator itr;
-    for (itr = successNames.begin(); itr != successNames.end(); ++itr) {
-        std::cout << *itr << "\n";
-    }
-}
-
 int wmain(int argc, const wchar_t * argv[])
 {
     t_params_struct iParams;
