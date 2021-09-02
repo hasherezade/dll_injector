@@ -1,13 +1,13 @@
 os:
   - Visual Studio 2015
-
+  
 platform: x64
   - x64
-
+  
 branches:
   only:
     - master
-
+  
 install:
   - git submodule update --init --recursive
   - set PATH=C:\Program Files\CMake\bin;%PATH%
@@ -16,20 +16,24 @@ build:
   verbosity: detailed
 
 configuration:
+  - Release
   - Debug
   
 environment:
-  matrix:
-    - env_arch: "x64"
-    - env_arch: "x86"
+  artifactName: $(APPVEYOR_PROJECT_NAME)-$(APPVEYOR_REPO_COMMIT)-$(CONFIGURATION)
 
-build_script:
+before_build:
   - mkdir build
   - cd build
-  - if [%env_arch%]==[x64] (
-      cmake .. -A x64 )
-  - if [%env_arch%]==[x86] (
-      cmake .. )
-  - cmake --build .
-  - cd ..
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=%APPVEYOR_BUILD_FOLDER%/%APPVEYOR_REPO_COMMIT% ..
+  
+build_script:
+  - cmake --build . --config %CONFIGURATION% --target install
+  
+after_build:
+  - mkdir %artifactName%
+  - cp %APPVEYOR_BUILD_FOLDER%/%APPVEYOR_REPO_COMMIT%/* %artifactName%
+
+artifacts:
+  - path: build\%artifactName%
   
