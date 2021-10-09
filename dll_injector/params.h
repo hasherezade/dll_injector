@@ -3,7 +3,7 @@
 #include <paramkit.h>
 
 #define PARAM_PID "pid"
-#define PARAM_EXE "exe"
+#define PARAM_TARGET "target"
 #define PARAM_DLL "dll"
 #define PARAM_ACTION "action"
 
@@ -19,7 +19,7 @@ typedef enum  {
 typedef struct {
     DWORD pid;
     std::wstring dll_path;
-    std::wstring exe_path;
+    std::wstring target;
     t_actions action;
 } t_params_struct;
 
@@ -44,57 +44,44 @@ public:
     InjParams()
         : Params()
     {
-        this->addParam(new IntParam(PARAM_PID, false));
-        this->setInfo(PARAM_PID, "Target PID (where to inject)");
-
-        this->addParam(new WStringParam(PARAM_EXE, false));
-        this->setInfo(PARAM_EXE, "Exe to be run with the DLL injected");
+        this->addParam(new WStringParam(PARAM_TARGET, true));
+        this->setInfo(PARAM_TARGET, "Exe to be run with the DLL injected, or target PID (where to inject)");
 
         this->addParam(new WStringParam(PARAM_DLL, true));
         this->setInfo(PARAM_DLL, "DLL path");
 
-        EnumParam *myEnum = new EnumParam(PARAM_ACTION, "action_id", true);
+        EnumParam *myEnum = new EnumParam(PARAM_ACTION, "action_id", false);
         this->addParam(myEnum);
         this->setInfo(PARAM_ACTION, "Action to be executed");
         myEnum->addEnumValue(t_actions::ACTION_CHECK, "C", "check if the DLL is loaded");
-        myEnum->addEnumValue(t_actions::ACTION_LOAD, "L", "load the DLL ");
+        myEnum->addEnumValue(t_actions::ACTION_LOAD, "L", "load the DLL [DEFAULT]");
         myEnum->addEnumValue(t_actions::ACTION_UNLOAD, "U", "unload the DLL");
     }
 
     bool fillStruct(t_params_struct &paramsStruct)
     {
-        copyVal<IntParam>(PARAM_PID, paramsStruct.pid);
         copyVal<EnumParam>(PARAM_ACTION, paramsStruct.action);
         copyVal<WStringParam>(PARAM_DLL, paramsStruct.dll_path);
-        copyVal<WStringParam>(PARAM_EXE, paramsStruct.exe_path);
+        copyVal<WStringParam>(PARAM_TARGET, paramsStruct.target);
         return true;
     }
-    
-    bool hasAlternativesFilled()
-    {
-        IntParam *pidParam = dynamic_cast<IntParam*>(this->getParam(PARAM_PID));
-        if (pidParam && pidParam->isSet()) {
-            return true;
-        }
-        WStringParam *exeParam = dynamic_cast<WStringParam*>(this->getParam(PARAM_EXE));
-        if (exeParam && exeParam->isSet()) {
-            return true;
-        }
-        return false;
-    }
 
-    void printAlternatives()
+    virtual void printBanner()
     {
-        std::cout << "Supply target PID or executable\n";
-        IntParam *pidParam = dynamic_cast<IntParam*>(this->getParam(PARAM_PID));
-        if (pidParam) {
-            pidParam->printInColor(paramColor);
-            std::cout << "\n";
-        }
-        WStringParam *exeParam = dynamic_cast<WStringParam*>(this->getParam(PARAM_EXE));
-        if (exeParam && !exeParam->isSet()) {
-            exeParam->printInColor(paramColor);
-            std::cout << "\n";
-        }
+        char logo1[] = "\n\
+ /\\_/\\                                            \n\
+((@v@))     Hookoo                                \n\
+():::()     Injector for hooking libraries        \n\
+-\" - \"----                                        ";
+        paramkit::print_in_color(MAKE_COLOR(BROWN, DARK_BLUE), logo1);
+        std::cout << "\n" << std::endl;
+#ifdef _WIN64
+        std::cout << "64-bit version\n";
+#else
+        std::cout << "32-bit version\n";
+#endif
+        std::cout << "Built on: " << __DATE__ << "\n";
+        std::cout << "URL: https://github.com/hasherezade/dll_injector \n";
+        std::cout << std::endl;
     }
 };

@@ -10,24 +10,7 @@
 
 #define INVALID_PID (-1)
 
-void banner()
-{
-    char logo1[] = "\n\
- /\\_/\\                                            \n\
-((@v@))     Hookoo                                \n\
-():::()     Injector for hooking libraries        \n\
--\" - \"----                                        ";
-    paramkit::print_in_color(MAKE_COLOR(BROWN, DARK_BLUE), logo1);
-    std::cout << "\n" << std::endl;
-#ifdef _WIN64
-    std::cout << "64-bit version\n";
-#else
-    std::cout << "32-bit version\n";
-#endif
-    std::cout << "Built on: " << __DATE__ << "\n";
-    std::cout << "URL: https://github.com/hasherezade/dll_injector \n";
-    std::cout << std::endl;
-}
+
 
 bool action_load(t_params_struct &iParams)
 {
@@ -77,32 +60,33 @@ int wmain(int argc, const wchar_t * argv[])
 {
     t_params_struct iParams = { 0 };
     iParams.pid = INVALID_PID;
-
+    iParams.action = t_actions::ACTION_LOAD;
     {
         InjParams params;
         if (argc < 2) {
-            banner();
+            params.printBanner();
             params.printInfo();
             system("pause");
             return 0;
         }
-        if (!params.parse(argc, argv) || !params.hasRequiredFilled()) {
-            return 0;
-        }
-        if (!params.hasAlternativesFilled()) {
-            params.printAlternatives();
+        if (!params.parse(argc, argv)) {
             return 0;
         }
         params.fillStruct(iParams);
     }
+    
+    if (set_debug_privilege()) {
+        std::cout << "[*] Debug privilege set!\n";
+    }
 
+    std::string str(iParams.target.begin(), iParams.target.end());
+    if (paramkit::is_number(str.c_str())) {
+        iParams.pid = paramkit::get_number(str.c_str());
+    }
 
     bool isCreated = false;
     HANDLE hThread = NULL;
     if (iParams.pid == INVALID_PID) {
-        if (iParams.exe_path == L"") {
-            return -1;
-        }
 
         PROCESS_INFORMATION pi = { 0 };
         STARTUPINFOW si = { 0 };
@@ -111,11 +95,13 @@ int wmain(int argc, const wchar_t * argv[])
         si.wShowWindow = SW_SHOW;
 
         BOOL is_ok = CreateProcessW(
-            iParams.exe_path.c_str(),
+            iParams.target.c_str(),
             NULL,
             NULL, NULL, TRUE,
-            CREATE_SUSPENDED,
-            NULL, NULL, &si, &pi);
+            CREATE_SUSPENDED | CREATE_NEW_CONSOLE,
+            NULL, NULL, 
+            &si, &pi
+        );
 
         if (!is_ok) {
             std::cerr << "Failed to create the process\n";
@@ -124,11 +110,6 @@ int wmain(int argc, const wchar_t * argv[])
         isCreated = true;
         iParams.pid = pi.dwProcessId;
         hThread = pi.hThread;
-    }
-
-
-    if (set_debug_privilege()) {
-        std::cout << "[*] Debug privilege set!\n";
     }
 
     std::wcout << "DLL: " << iParams.dll_path << "\n";
@@ -143,7 +124,7 @@ int wmain(int argc, const wchar_t * argv[])
     case t_actions::ACTION_CHECK:
         res = action_check(iParams); break;
     }
-    
+
     std::cout << std::endl;
 
     if (isCreated) {
