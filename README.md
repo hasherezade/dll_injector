@@ -9,6 +9,10 @@ Supported actions:
 + Unload DLL
 + Check if the DLL is loaded
 
+Allows to inject into:
++ Existing process
++ Newly created process
+
 Arguments:
 ```
 Required:
