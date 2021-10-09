@@ -76,7 +76,7 @@ int wmain(int argc, const wchar_t * argv[])
         InjParams params;
         if (argc < 2) {
             banner();
-            params.info();
+            params.printInfo();
             system("pause");
             return 0;
         }
