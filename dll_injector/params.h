@@ -3,6 +3,7 @@
 #include <paramkit.h>
 
 #define PARAM_PID "pid"
+#define PARAM_TARGET "target"
 #define PARAM_DLL "dll"
 #define PARAM_ACTION "action"
 
@@ -18,6 +19,7 @@ typedef enum  {
 typedef struct {
     DWORD pid;
     std::wstring dll_path;
+    std::wstring target;
     t_actions action;
 } t_params_struct;
 
@@ -42,25 +44,44 @@ public:
     InjParams()
         : Params()
     {
-        this->addParam(new IntParam(PARAM_PID, true));
-        this->setInfo(PARAM_PID, "Target PID (where to inject)");
+        this->addParam(new WStringParam(PARAM_TARGET, true));
+        this->setInfo(PARAM_TARGET, "Exe to be run with the DLL injected, or target PID (where to inject)");
 
         this->addParam(new WStringParam(PARAM_DLL, true));
         this->setInfo(PARAM_DLL, "DLL path");
 
-        EnumParam *myEnum = new EnumParam(PARAM_ACTION, "action_id", true);
+        EnumParam *myEnum = new EnumParam(PARAM_ACTION, "action_id", false);
         this->addParam(myEnum);
         this->setInfo(PARAM_ACTION, "Action to be executed");
         myEnum->addEnumValue(t_actions::ACTION_CHECK, "C", "check if the DLL is loaded");
-        myEnum->addEnumValue(t_actions::ACTION_LOAD, "L", "load the DLL ");
+        myEnum->addEnumValue(t_actions::ACTION_LOAD, "L", "load the DLL [DEFAULT]");
         myEnum->addEnumValue(t_actions::ACTION_UNLOAD, "U", "unload the DLL");
     }
 
     bool fillStruct(t_params_struct &paramsStruct)
     {
-        copyVal<IntParam>(PARAM_PID, paramsStruct.pid);
         copyVal<EnumParam>(PARAM_ACTION, paramsStruct.action);
         copyVal<WStringParam>(PARAM_DLL, paramsStruct.dll_path);
+        copyVal<WStringParam>(PARAM_TARGET, paramsStruct.target);
         return true;
+    }
+
+    virtual void printBanner()
+    {
+        char logo1[] = "\n\
+ /\\_/\\                                            \n\
+((@v@))     Hookoo                                \n\
+():::()     Injector for hooking libraries        \n\
+-\" - \"----                                        ";
+        paramkit::print_in_color(MAKE_COLOR(BROWN, DARK_BLUE), logo1);
+        std::cout << "\n" << std::endl;
+#ifdef _WIN64
+        std::cout << "64-bit version\n";
+#else
+        std::cout << "32-bit version\n";
+#endif
+        std::cout << "Built on: " << __DATE__ << "\n";
+        std::cout << "URL: https://github.com/hasherezade/dll_injector \n";
+        std::cout << std::endl;
     }
 };
