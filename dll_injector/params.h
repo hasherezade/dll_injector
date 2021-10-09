@@ -58,16 +58,9 @@ public:
 
     bool fillStruct(t_params_struct &paramsStruct)
     {
-        IntParam *myDec = dynamic_cast<IntParam*>(this->getParam(PARAM_PID));
-        if (myDec && myDec->isSet()) paramsStruct.pid = myDec->value;
-        
-        EnumParam *myEnum = dynamic_cast<EnumParam*>(this->getParam(PARAM_ACTION));
-        if (myEnum && myEnum->isSet()) paramsStruct.action = (myEnum->value) > ACTIONS_COUNT ? ACTION_CHECK: t_actions(myEnum->value);
-
-        WStringParam *myStr = dynamic_cast<WStringParam*>(this->getParam(PARAM_DLL));
-        if (myStr) {
-            paramsStruct.dll_path = myStr->value;
-        }
+        copyVal<IntParam>(PARAM_PID, paramsStruct.pid);
+        copyVal<EnumParam>(PARAM_ACTION, paramsStruct.action);
+        copyVal<WStringParam>(PARAM_DLL, paramsStruct.dll_path);
         return true;
     }
 };
