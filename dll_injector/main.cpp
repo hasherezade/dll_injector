@@ -59,19 +59,23 @@ HANDLE create_new_process(IN std::wstring exe_path, IN  std::wstring cmd, OUT PR
 {
     std::wstring full_cmd = std::wstring(exe_path) + L" " + std::wstring(cmd);
 
-    std::string exe_str(exe_path.begin(), exe_path.end());
-    std::string cmd_str(full_cmd.begin(), full_cmd.end());
-    std::cout << "Command: " << cmd_str << std::endl;
+    const size_t buf_len = (full_cmd.length() + 1) * sizeof(wchar_t);
+    wchar_t* cmd_str = new wchar_t[buf_len];
+    if (cmd_str) {
+        memset(cmd_str, 0, buf_len);
+        memcpy(cmd_str, full_cmd.c_str(), buf_len);
+    }
 
-    STARTUPINFOA si = { 0 };
-    si.cb = sizeof(STARTUPINFOA);
+    STARTUPINFOW si = { 0 };
+    si.cb = sizeof(STARTUPINFOW);
     si.dwFlags = STARTF_USESHOWWINDOW;
     si.wShowWindow = SW_SHOW;
 
+    HANDLE pHndl = NULL;
     memset(&pi, 0, sizeof(PROCESS_INFORMATION));
-    if (!CreateProcessA(
-        exe_str.c_str(),
-        (LPSTR)cmd_str.c_str(),
+    if (CreateProcessW(
+        exe_path.c_str(),
+        cmd_str,
         NULL, //lpProcessAttributes
         NULL, //lpThreadAttributes
         FALSE, //bInheritHandles
@@ -82,12 +86,15 @@ HANDLE create_new_process(IN std::wstring exe_path, IN  std::wstring cmd, OUT PR
         &pi //lpProcessInformation
     ))
     {
-#ifdef _DEBUG
-        std::cerr << "[ERROR] CreateProcess failed, Error = " << GetLastError() << std::endl;
-#endif
-        return NULL;
+        pHndl  = pi.hProcess;
     }
-    return pi.hProcess;
+#ifdef _DEBUG
+    else {
+        std::cerr << "[ERROR] CreateProcess failed, Error = " << GetLastError() << std::endl;
+    }
+#endif
+    delete[]cmd_str;
+    return pHndl;
 }
 
 
