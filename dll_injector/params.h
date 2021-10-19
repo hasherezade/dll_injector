@@ -52,7 +52,7 @@ public:
         this->addParam(new WStringParam(PARAM_DLL, true));
         this->setInfo(PARAM_DLL, "DLL path");
 
-        this->addParam(new WStringParam(PARAM_CMD, true));
+        this->addParam(new WStringParam(PARAM_CMD, false));
         this->setInfo(PARAM_CMD, "Commandline arguments (for a newly created process)");
 
         EnumParam *myEnum = new EnumParam(PARAM_ACTION, "action_id", false);
