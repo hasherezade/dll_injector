@@ -6,6 +6,7 @@
 #define PARAM_TARGET "target"
 #define PARAM_DLL "dll"
 #define PARAM_ACTION "action"
+#define PARAM_CMD "cmd"
 
 using namespace paramkit;
 
@@ -20,6 +21,7 @@ typedef struct {
     DWORD pid;
     std::wstring dll_path;
     std::wstring target;
+    std::wstring cmd;
     t_actions action;
 } t_params_struct;
 
@@ -50,6 +52,9 @@ public:
         this->addParam(new WStringParam(PARAM_DLL, true));
         this->setInfo(PARAM_DLL, "DLL path");
 
+        this->addParam(new WStringParam(PARAM_CMD, true));
+        this->setInfo(PARAM_CMD, "Commandline arguments (for a newly created process)");
+
         EnumParam *myEnum = new EnumParam(PARAM_ACTION, "action_id", false);
         this->addParam(myEnum);
         this->setInfo(PARAM_ACTION, "Action to be executed");
@@ -63,6 +68,7 @@ public:
         copyVal<EnumParam>(PARAM_ACTION, paramsStruct.action);
         copyVal<WStringParam>(PARAM_DLL, paramsStruct.dll_path);
         copyVal<WStringParam>(PARAM_TARGET, paramsStruct.target);
+        copyVal<WStringParam>(PARAM_CMD, paramsStruct.cmd);
         return true;
     }
 

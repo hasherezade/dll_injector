@@ -96,7 +96,7 @@ int wmain(int argc, const wchar_t * argv[])
 
         BOOL is_ok = CreateProcessW(
             iParams.target.c_str(),
-            NULL,
+            (LPWSTR)iParams.cmd.c_str(),
             NULL, NULL, TRUE,
             CREATE_SUSPENDED | CREATE_NEW_CONSOLE,
             NULL, NULL, 
