@@ -55,6 +55,41 @@ bool action_unload(t_params_struct &iParams)
 }
 
 
+HANDLE create_new_process(IN std::wstring exe_path, IN  std::wstring cmd, OUT PROCESS_INFORMATION &pi, DWORD flags)
+{
+    std::wstring full_cmd = std::wstring(exe_path) + L" " + std::wstring(cmd);
+
+    std::string exe_str(exe_path.begin(), exe_path.end());
+    std::string cmd_str(full_cmd.begin(), full_cmd.end());
+    std::cout << "Command: " << cmd_str << std::endl;
+
+    STARTUPINFOA si = { 0 };
+    si.cb = sizeof(STARTUPINFOA);
+    si.dwFlags = STARTF_USESHOWWINDOW;
+    si.wShowWindow = SW_SHOW;
+
+    memset(&pi, 0, sizeof(PROCESS_INFORMATION));
+    if (!CreateProcessA(
+        exe_str.c_str(),
+        (LPSTR)cmd_str.c_str(),
+        NULL, //lpProcessAttributes
+        NULL, //lpThreadAttributes
+        FALSE, //bInheritHandles
+        flags, //dwCreationFlags
+        NULL, //lpEnvironment 
+        NULL, //lpCurrentDirectory
+        &si, //lpStartupInfo
+        &pi //lpProcessInformation
+    ))
+    {
+#ifdef _DEBUG
+        std::cerr << "[ERROR] CreateProcess failed, Error = " << GetLastError() << std::endl;
+#endif
+        return NULL;
+    }
+    return pi.hProcess;
+}
+
 
 int wmain(int argc, const wchar_t * argv[])
 {
@@ -89,24 +124,12 @@ int wmain(int argc, const wchar_t * argv[])
     if (iParams.pid == INVALID_PID) {
 
         PROCESS_INFORMATION pi = { 0 };
-        STARTUPINFOW si = { 0 };
-        si.cb = sizeof(STARTUPINFOW);
-        si.dwFlags = STARTF_USESHOWWINDOW;
-        si.wShowWindow = SW_SHOW;
-
-        BOOL is_ok = CreateProcessW(
-            iParams.target.c_str(),
-            (LPWSTR)iParams.cmd.c_str(),
-            NULL, NULL, TRUE,
-            CREATE_SUSPENDED | CREATE_NEW_CONSOLE,
-            NULL, NULL, 
-            &si, &pi
-        );
-
-        if (!is_ok) {
+        HANDLE proc = create_new_process(iParams.target, iParams.cmd, pi, CREATE_SUSPENDED | CREATE_NEW_CONSOLE);
+        if (!proc) {
             std::cerr << "Failed to create the process\n";
             return -1;
         }
+
         isCreated = true;
         iParams.pid = pi.dwProcessId;
         hThread = pi.hThread;
