@@ -32,7 +32,12 @@ Optional:
 	 : Commandline arguments (for a newly created process)
 ```
 
-Clone:
+Builds
+-
+📦 ⚙️ Download the latest [release](https://github.com/hasherezade/dll_injector/releases).
+
+
+Clone
 -
 Use recursive clone to get the repo together with all the submodules:
 ```console
