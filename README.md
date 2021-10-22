@@ -28,6 +28,8 @@ Optional:
 	0 (C) - check if the DLL is loaded
 	1 (L) - load the DLL [DEFAULT]
 	2 (U) - unload the DLL
+/cmd <wstring>
+	 : Commandline arguments (for a newly created process)
 ```
 
 Clone:
