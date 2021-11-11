@@ -43,3 +43,9 @@ Use recursive clone to get the repo together with all the submodules:
 ```console
 git clone --recursive https://github.com/hasherezade/dll_injector.git
 ```
+
+Hooking DLLs
+-
+This is a generic injector, not tied to any particular hooking engine.
+
+If you need a quick template helpful in building your own injectable DLL, you can check [this one](https://github.com/hasherezade/detours_cmake_tpl).
