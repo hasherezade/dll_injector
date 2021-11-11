@@ -32,6 +32,8 @@ Optional:
 	 : Commandline arguments (for a newly created process)
 ```
 
+**NOTE:** Use the injector and a DLL with the same bitness as your target (appropriately 32, or 64 bit).
+
 Builds
 -
 📦 ⚙️ Download the latest [release](https://github.com/hasherezade/dll_injector/releases).
