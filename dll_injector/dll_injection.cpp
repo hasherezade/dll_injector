@@ -44,6 +44,7 @@ bool inject_with_loadlibrary(HANDLE hProcess, const wchar_t *inject_path)
     HANDLE hndl = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)hLoadLib, remote_ptr, NULL, NULL);
     if (hndl) {
         ret = WaitForSingleObject(hndl, INJ_TIMEOUT);
+        CloseHandle(hndl); hndl = NULL;
     }
     else {
         std::cout << "Creating thread failed!\n";
@@ -72,6 +73,7 @@ bool unload_remote_module(HANDLE hProcess, HANDLE toUnload)
     HANDLE hndl = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)toExec, toUnload, NULL, NULL);
     if (hndl) {
         ret = WaitForSingleObject(hndl, INFINITE);
+        CloseHandle(hndl); hndl = NULL;
     }
     else {
         std::cout << "Creating thread failed!\n";
