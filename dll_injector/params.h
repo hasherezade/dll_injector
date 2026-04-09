@@ -7,6 +7,7 @@
 #define PARAM_DLL "dll"
 #define PARAM_ACTION "action"
 #define PARAM_CMD "cmd"
+#define PARAM_DBG "dbg"
 
 using namespace paramkit;
 
@@ -23,6 +24,7 @@ typedef struct {
     std::wstring target;
     std::wstring cmd;
     t_actions action;
+    bool dbg;
 } t_params_struct;
 
 
@@ -55,6 +57,9 @@ public:
         this->addParam(new WStringParam(PARAM_CMD, false));
         this->setInfo(PARAM_CMD, "Commandline arguments (for a newly created process)");
 
+        this->addParam(new BoolParam(PARAM_DBG, false));
+        this->setInfo(PARAM_DBG, "Wait for debugger to attach before injecting. Only works when /" PARAM_TARGET " is a path.");
+
         EnumParam *myEnum = new EnumParam(PARAM_ACTION, "action_id", false);
         this->addParam(myEnum);
         this->setInfo(PARAM_ACTION, "Action to be executed");
@@ -69,6 +74,7 @@ public:
         copyVal<WStringParam>(PARAM_DLL, paramsStruct.dll_path);
         copyVal<WStringParam>(PARAM_TARGET, paramsStruct.target);
         copyVal<WStringParam>(PARAM_CMD, paramsStruct.cmd);
+        copyVal<BoolParam>(PARAM_DBG, paramsStruct.dbg);
         return true;
     }
 

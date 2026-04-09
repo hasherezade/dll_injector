@@ -98,6 +98,20 @@ HANDLE create_new_process(IN std::wstring exe_path, IN  std::wstring cmd, OUT PR
 }
 
 
+void wait_for_debugger(HANDLE proc) {
+    BOOL is_debugger_present = false;
+    std::cout << "Waiting for debugger to attach... " << std::flush;
+    while (CheckRemoteDebuggerPresent(proc, &is_debugger_present) && !is_debugger_present) {
+        Sleep(100);
+    }
+    if (!is_debugger_present) {
+        std::cout << "CheckRemoteDebuggerPresent failed. Continuing without debugger." << std::endl;
+    } else {
+        std::cout << "Debugger attached, continuing." << std::endl;
+    }
+}
+
+
 int wmain(int argc, const wchar_t * argv[])
 {
     t_params_struct iParams = { 0 };
@@ -123,6 +137,11 @@ int wmain(int argc, const wchar_t * argv[])
 
     std::string str(iParams.target.begin(), iParams.target.end());
     if (paramkit::is_number(str.c_str())) {
+        if (iParams.dbg) {
+            std::cerr << "/" PARAM_DBG " is only supported with a path given to /" PARAM_TARGET << std::endl;
+            return -1;
+        }
+
         iParams.pid = paramkit::get_number(str.c_str());
     }
 
@@ -140,6 +159,10 @@ int wmain(int argc, const wchar_t * argv[])
         isCreated = true;
         iParams.pid = pi.dwProcessId;
         hThread = pi.hThread;
+
+        if (iParams.dbg) {
+            wait_for_debugger(proc);
+        }
     }
 
     std::wcout << "DLL: " << iParams.dll_path << "\n";
